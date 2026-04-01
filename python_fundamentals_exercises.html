@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Python Fundamentals — Exercises</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0f;
+    --surface: #161618;
+    --surface2: #1e1e21;
+    --border: #2a2a2e;
+    --accent: #00d97e;
+    --accent-dim: rgba(0, 217, 126, 0.12);
+    --accent-dim2: rgba(0, 217, 126, 0.06);
+    --text: #e8e8ea;
+    --text-muted: #6e6e78;
+    --text-secondary: #9999a8;
+    --amber: #f5a623;
+    --amber-dim: rgba(245, 166, 35, 0.1);
+    --purple: #a78bfa;
+    --purple-dim: rgba(167, 139, 250, 0.1);
+    --blue: #60a5fa;
+    --blue-dim: rgba(96, 165, 250, 0.1);
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 48px 32px 80px;
+  }
+
+  .header {
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 32px;
+    margin-bottom: 40px;
+  }
+
+  .header-meta {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  h1 span { color: var(--accent); }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 300;
+    margin-bottom: 24px;
+  }
+
+  .progress-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .progress-label {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    min-width: 110px;
+    text-align: right;
+  }
+
+  .progress-label span { color: var(--accent); }
+
+  .module {
+    margin-bottom: 28px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .module.all-done { border-color: rgba(0, 217, 126, 0.3); }
+
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--surface);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s;
+  }
+
+  .module-header:hover { background: var(--surface2); }
+
+  .module-num {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    width: 28px;
+    flex-shrink: 0;
+  }
+
+  .module-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .module-file {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 4px;
+  }
+
+  .module-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    min-width: 44px;
+    text-align: right;
+  }
+
+  .module-count.done { color: var(--accent); }
+
+  .chevron {
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .module.open .chevron { transform: rotate(90deg); }
+
+  .module-body {
+    display: none;
+    border-top: 1px solid var(--border);
+  }
+
+  .module.open .module-body { display: block; }
+
+  /* Exercise card */
+  .exercise {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .exercise:last-child { border-bottom: none; }
+
+  .exercise-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 13px 18px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .exercise-header:hover { background: var(--surface2); }
+  .exercise.done .exercise-header { background: var(--accent-dim2); }
+
+  .checkbox {
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    background: transparent;
+  }
+
+  .exercise.done .checkbox {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .checkmark {
+    display: none;
+    color: #0e0e0f;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .exercise.done .checkmark { display: block; }
+
+  .exercise-summary { flex: 1; }
+
+  .exercise-title {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 400;
+    transition: color 0.15s;
+  }
+
+  .exercise.done .exercise-title {
+    color: var(--text-muted);
+    text-decoration: line-through;
+    text-decoration-color: var(--text-muted);
+  }
+
+  .exercise-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    font-family: var(--mono);
+  }
+
+  .tags {
+    display: flex;
+    gap: 5px;
+    margin-top: 4px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 1px 7px;
+    border-radius: 3px;
+    letter-spacing: 0.04em;
+  }
+
+  .tag-core { background: var(--accent-dim); color: var(--accent); }
+  .tag-stretch { background: var(--amber-dim); color: var(--amber); }
+  .tag-github { background: var(--purple-dim); color: var(--purple); }
+  .tag-hint { background: var(--blue-dim); color: var(--blue); }
+
+  .expand-icon {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-top: 3px;
+    transition: transform 0.2s;
+  }
+
+  .exercise.open .expand-icon { transform: rotate(90deg); }
+
+  /* Exercise detail panel */
+  .exercise-body {
+    display: none;
+    padding: 0 18px 18px 50px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+
+  .exercise.open .exercise-body { display: block; }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin: 16px 0 8px;
+  }
+
+  .instruction {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    white-space: pre-wrap;
+  }
+
+  pre {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text);
+    line-height: 1.7;
+    overflow-x: auto;
+    margin-top: 8px;
+    white-space: pre;
+  }
+
+  .hint-box {
+    background: var(--blue-dim);
+    border: 1px solid rgba(96, 165, 250, 0.2);
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--blue);
+    margin-top: 8px;
+    line-height: 1.7;
+  }
+
+  .done-btn {
+    margin-top: 16px;
+    padding: 7px 18px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .done-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .exercise.done .done-btn {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+  }
+
+  .banner {
+    display: none;
+    margin-top: 32px;
+    padding: 18px 24px;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    background: var(--accent-dim);
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--accent);
+    text-align: center;
+    letter-spacing: 0.03em;
+  }
+
+  .banner.visible { display: block; }
+
+  .footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .legend { display: flex; gap: 20px; flex-wrap: wrap; }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .footer-note {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    line-height: 1.8;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-meta">Aristechius Karumuna &nbsp;/&nbsp; Data Engineering Upskilling 2026 &nbsp;/&nbsp; Phase 1</div>
+    <h1>Python <span>exercises</span></h1>
+    <p class="subtitle">6 modules, 29 exercises. Click any exercise to see the full task, expected output, and hint.</p>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="pbar"></div></div>
+      <div class="progress-label"><span id="done-count">0</span> / 29 complete</div>
+    </div>
+  </div>
+
+  <div id="modules"></div>
+
+  <div class="banner" id="banner">
+    ✓ &nbsp; All exercises complete — commit your files and start the Pandas bootcamp.
+  </div>
+
+  <div class="footer">
+    <div class="legend">
+      <div class="legend-item"><span class="tag tag-core">core</span> Key concept to know well</div>
+      <div class="legend-item"><span class="tag tag-stretch">stretch</span> A bit harder — worth doing</div>
+      <div class="legend-item"><span class="tag tag-github">github</span> Looks great in your repo</div>
+      <div class="legend-item"><span class="tag tag-hint">hint</span> Expand to see hint</div>
+    </div>
+    <div class="footer-note">
+      Upskilling Plan 2026<br>
+      Phase 1 — Foundations
+    </div>
+  </div>
+
+</div>
+
+<script>
+const data = [
+  {
+    num: "01", title: "Core data types & variables", file: "01_data_types.py",
+    exercises: [
+      {
+        title: "Declare variables of each type: int, float, str, bool",
+        meta: "Print each one with type()",
+        tags: [],
+        instruction: "Declare one variable of each type: int, float, str, bool.\nPrint each variable alongside its type using type().",
+        expected: "42 <class 'int'>\n3.14 <class 'float'>\nHello, Aris <class 'str'>\nTrue <class 'bool'>",
+        hint: "print(my_variable, type(my_variable))"
+      },
+      {
+        title: "Use arithmetic operators and show integer vs float division",
+        meta: "Include //, %, **",
+        tags: ["core"],
+        instruction: "Using the numbers 17 and 5, demonstrate each operator below.\nPrint a label and the result for each one.\n\nOperators to cover:\n  +   addition\n  -   subtraction\n  *   multiplication\n  /   division (float result)\n  //  integer division (floor)\n  %   modulus (remainder)\n  **  exponentiation",
+        expected: "17 + 5 = 22\n17 - 5 = 12\n17 * 5 = 85\n17 / 5 = 3.4\n17 // 5 = 3\n17 % 5 = 2\n17 ** 5 = 1419857",
+        hint: 'Use f-strings — print(f"17 + 5 = {17 + 5}")'
+      },
+      {
+        title: "String slicing — extract substrings, reverse a string, count vowels",
+        meta: "No external libraries",
+        tags: [],
+        instruction: 'Given the string: string = "Data Engineering"\n\nTask A: Extract and print just the word "Engineering"\nTask B: Reverse the entire string and print it\nTask C: Count and print the number of vowels (a, e, i, o, u)',
+        expected: "Engineering\ngnireenignE ataD\nVowel count: 7",
+        hint: "A: string[5:]\nB: string[::-1]\nC: loop through and check if char in \"aeiouAEIOU\""
+      },
+      {
+        title: "f-string formatting — build a sentence from 3 variables",
+        meta: "Include a number formatted to 2 decimal places",
+        tags: ["core"],
+        instruction: "You have three variables:\n  name = \"Aris\"\n  role = \"Data Engineer\"\n  salary = 75000.678\n\nBuild and print ONE sentence using an f-string that:\n  - includes all three variables\n  - formats the salary to exactly 2 decimal places",
+        expected: "Hi, I'm Aris. I'm training to be a Data Engineer with a target salary of €75000.68.",
+        hint: "{salary:.2f} formats a float to 2 decimal places"
+      },
+      {
+        title: "Type conversion — convert between int, float, str with error handling",
+        meta: "Use try/except for an invalid cast",
+        tags: ["stretch"],
+        instruction: "Task A: Convert the string \"2026\" to an integer and print it with its type\nTask B: Convert the integer 42 to a float and print it with its type\nTask C: Try to convert the string \"hello\" to an integer.\n        Catch the ValueError and print a friendly message.",
+        expected: "2026 <class 'int'>\n42.0 <class 'float'>\nCannot convert 'hello' to int",
+        hint: "except ValueError: — wraps the int() call in a try block"
+      }
+    ]
+  },
+  {
+    num: "02", title: "Control flow", file: "02_control_flow.py",
+    exercises: [
+      {
+        title: "if / elif / else — classify a number as negative, zero, or positive",
+        meta: "",
+        tags: [],
+        instruction: "Write a function called classify(n) that takes a number and prints\nwhether it is 'negative', 'zero', or 'positive'.\n\nTest it with: classify(-5), classify(0), classify(12)",
+        expected: "-5 is negative\n0 is zero\n12 is positive",
+        hint: "if n < 0 / elif n == 0 / else"
+      },
+      {
+        title: "for loop — iterate a list and print index + value using enumerate()",
+        meta: "",
+        tags: ["core"],
+        instruction: "Given the list below, loop through it using enumerate()\nand print the index and value of each item.\n\nskills = [\"Python\", \"Pandas\", \"SQL\", \"AWS\"]",
+        expected: "0: Python\n1: Pandas\n2: SQL\n3: AWS",
+        hint: "for index, value in enumerate(skills):"
+      },
+      {
+        title: "while loop — Collatz conjecture: count steps to reach 1 from n",
+        meta: "Combines loop + condition nicely",
+        tags: ["stretch"],
+        instruction: "The Collatz conjecture:\n  - If n is even: divide by 2\n  - If n is odd: multiply by 3 and add 1\n  - Repeat until n reaches 1\n\nStart at n = 27. Count and print each step, then print the total.",
+        expected: "Step 1: 82\nStep 2: 41\nStep 3: 124\n...\nReached 1 in 111 steps",
+        hint: "while n != 1: — track steps with a counter variable"
+      },
+      {
+        title: "List comprehension — squares of even numbers from 1 to 20",
+        meta: "One-liner",
+        tags: ["core"],
+        instruction: "Using a ONE-LINE list comprehension, create a list of the squares\nof all even numbers from 1 to 20 (inclusive).\nPrint the result.",
+        expected: "[4, 16, 36, 64, 100, 144, 196, 256, 324, 400]",
+        hint: "[x**2 for x in range(1, 21) if x % 2 == 0]"
+      },
+      {
+        title: "Nested loop — print a 10×10 multiplication table",
+        meta: "",
+        tags: [],
+        instruction: "Print a 10x10 multiplication table using nested loops.\nFormat each number so columns are aligned neatly.",
+        expected: "1    2    3    4    5    6    7    8    9    10\n2    4    6    8    10   12   14   16   18   20\n...",
+        hint: "print(f\"{i*j:<5}\", end=\"\") — :<5 left-aligns in 5 characters\nprint() at end of each row to move to next line"
+      }
+    ]
+  },
+  {
+    num: "03", title: "Functions", file: "03_functions.py",
+    exercises: [
+      {
+        title: "Write a function with default arguments that returns a value",
+        meta: "e.g. greet(name, greeting='Hello')",
+        tags: [],
+        instruction: "Write a function called greet(name, greeting=\"Hello\") that:\n  - Takes a name and an optional greeting\n  - Returns (not just prints) the full greeting string\n\nTest it three ways:\n  greet(\"Aris\")\n  greet(\"Aris\", \"Good morning\")\n  greet(\"Aris\", greeting=\"Hey\")",
+        expected: "Hello, Aris!\nGood morning, Aris!\nHey, Aris!",
+        hint: "def greet(name, greeting=\"Hello\"):\n    return f\"{greeting}, {name}!\""
+      },
+      {
+        title: "Write a function using *args and **kwargs",
+        meta: "Print each positional and keyword argument",
+        tags: ["core"],
+        instruction: "Write a function called describe(*args, **kwargs) that:\n  - Prints each positional argument labelled 'arg:'\n  - Prints each keyword argument labelled 'kwarg:'\n\nTest with: describe(\"Python\", \"Pandas\", level=\"beginner\", goal=\"data engineer\")",
+        expected: "arg: Python\narg: Pandas\nkwarg: level = beginner\nkwarg: goal = data engineer",
+        hint: "for key, value in kwargs.items():\n    print(f\"kwarg: {key} = {value}\")"
+      },
+      {
+        title: "Recursive function — implement both factorial and fibonacci",
+        meta: "Make sure the base case is correct",
+        tags: ["stretch"],
+        instruction: "Task A: Write a recursive function factorial(n) that returns n!\n  Test: factorial(5) → 120\n\nTask B: Write a recursive function fibonacci(n) that returns the nth number\n  Test: fibonacci(8) → 21\n\nPrint both results.",
+        expected: "factorial(5) = 120\nfibonacci(8) = 21",
+        hint: "factorial base case: if n == 0: return 1\nfibonacci base case: if n <= 1: return n"
+      },
+      {
+        title: "Lambda + sorted() — sort a list of dicts by a specific key",
+        meta: "Use key=lambda",
+        tags: ["core"],
+        instruction: "Given the list of stocks below, sort it two ways:\n\nTask A: Sort by price (lowest to highest)\nTask B: Sort by volume (highest to lowest)\nPrint both sorted lists.\n\nstocks = [\n  {\"ticker\": \"AAPL\", \"price\": 412.0, \"volume\": 15000},\n  {\"ticker\": \"MSFT\", \"price\": 310.2, \"volume\": 22000},\n  {\"ticker\": \"TSLA\", \"price\": 180.5, \"volume\": 30000},\n]",
+        expected: "By price:  [TSLA 180.5, MSFT 310.2, AAPL 412.0]\nBy volume: [TSLA 30000, MSFT 22000, AAPL 15000]",
+        hint: "sorted(stocks, key=lambda x: x['price'])\nsorted(stocks, key=lambda x: x['volume'], reverse=True)"
+      },
+      {
+        title: "Docstring practice — fully document one of your functions",
+        meta: "Include Args, Returns, and an Example",
+        tags: ["github"],
+        instruction: "Take your greet() function and add a full docstring.\nYour docstring must include:\n  - A one-line summary\n  - Args: section with each parameter and its type\n  - Returns: section describing what it returns\n  - Example: section showing usage and expected output",
+        expected: "def greet(name, greeting=\"Hello\"):\n    \"\"\"\n    Return a personalised greeting string.\n\n    Args:\n        name (str): The person's name.\n        greeting (str): The greeting word. Defaults to 'Hello'.\n\n    Returns:\n        str: A formatted greeting.\n\n    Example:\n        >>> greet(\"Aris\")\n        'Hello, Aris!'\n    \"\"\"",
+        hint: "Use triple quotes directly under the def line.\nGoogle style or NumPy style both work — pick one and be consistent."
+      }
+    ]
+  },
+  {
+    num: "04", title: "Data structures", file: "04_data_structures.py",
+    exercises: [
+      {
+        title: "List operations — append, insert, remove, slice, sort, reverse",
+        meta: "Show in-place vs returning a new list",
+        tags: [],
+        instruction: "Starting with: tools = [\"Python\", \"Pandas\", \"AWS\", \"Airflow\"]\n\nTask A: append \"Spark\" to the end\nTask B: insert \"SQL\" at index 1\nTask C: remove \"Pandas\" from the list\nTask D: slice and print only the first 3 items\nTask E: sort the list alphabetically\nTask F: reverse the sorted list\n\nPrint the result after each step.",
+        expected: "After append:  ['Python', 'Pandas', 'AWS', 'Airflow', 'Spark']\nAfter insert:  ['Python', 'SQL', 'Pandas', 'AWS', 'Airflow', 'Spark']\nAfter remove:  ['Python', 'SQL', 'AWS', 'Airflow', 'Spark']\nFirst 3:       ['Python', 'SQL', 'AWS']\nSorted:        ['Airflow', 'AWS', 'Python', 'Spark', 'SQL']\nReversed:      ['SQL', 'Spark', 'Python', 'AWS', 'Airflow']",
+        hint: "sort() modifies in-place (returns None)\nsorted() returns a new list (original unchanged)"
+      },
+      {
+        title: "Dictionary — build a word frequency counter from a string",
+        meta: "Use .get() with a default value",
+        tags: ["core"],
+        instruction: "Given the sentence below, build a dictionary that counts\nhow many times each word appears.\nPrint each word and its count, sorted by count (highest first).\n\nsentence = \"data engineering is the future of data and data is engineering\"",
+        expected: "data: 3\nis: 2\nengineering: 2\nthe: 1\nfuture: 1\nof: 1\nand: 1",
+        hint: "freq[word] = freq.get(word, 0) + 1\nTo sort: sorted(freq.items(), key=lambda x: x[1], reverse=True)"
+      },
+      {
+        title: "Set operations — union, intersection, difference on two sets",
+        meta: "Scenario: find common tags between two articles",
+        tags: ["core"],
+        instruction: "Two articles have these tags:\n  article1_tags = {\"python\", \"sql\", \"aws\", \"spark\", \"airflow\"}\n  article2_tags = {\"python\", \"sql\", \"aws\", \"kafka\", \"pandas\"}\n\nTask A: union — all unique tags across both articles\nTask B: intersection — tags in both articles\nTask C: difference — tags in article1 but NOT article2",
+        expected: "Union:    {'python', 'sql', 'aws', 'spark', 'airflow', 'kafka', 'pandas'}\nBoth:     {'python', 'sql', 'aws'}\nOnly A1:  {'spark', 'airflow'}",
+        hint: "A: article1_tags | article2_tags\nB: article1_tags & article2_tags\nC: article1_tags - article2_tags"
+      },
+      {
+        title: "Tuple unpacking — swap two variables; unpack a coordinate pair",
+        meta: "",
+        tags: [],
+        instruction: "Task A: Swap two variables using tuple unpacking (no temp variable)\n  Start: x = 10, y = 20\n  After swap: x = 20, y = 10\n\nTask B: Unpack the coordinate tuple into named variables\n  and print a formatted string.\n  coordinate = (53.3498, -6.2603)",
+        expected: "Before swap: x=10, y=20\nAfter swap:  x=20, y=10\nLatitude: 53.3498, Longitude: -6.2603  (Dublin!)",
+        hint: "A: x, y = y, x\nB: lat, lon = coordinate"
+      },
+      {
+        title: "Nested dict — model 3 stocks with price and volume, loop and print a summary",
+        meta: "",
+        tags: ["stretch"],
+        instruction: "Model 3 stocks as a nested dictionary with price and volume.\nLoop through and print a formatted summary for each stock.\n\nportfolio = {\n    \"AAPL\": {\"price\": 412.0, \"volume\": 15000},\n    \"MSFT\": {\"price\": 310.2, \"volume\": 22000},\n    \"TSLA\": {\"price\": 180.5, \"volume\": 30000},\n}",
+        expected: "AAPL  | Price: $412.00 | Volume: 15,000\nMSFT  | Price: $310.20 | Volume: 22,000\nTSLA  | Price: $180.50 | Volume: 30,000",
+        hint: "for ticker, data in portfolio.items():\n    print(f\"{ticker:<6}| Price: ${data['price']:.2f} | Volume: {data['volume']:,}\")"
+      }
+    ]
+  },
+  {
+    num: "05", title: "File I/O & error handling", file: "05_files_errors.py",
+    exercises: [
+      {
+        title: "Write a list of items to a .txt file, then read it back line by line",
+        meta: "Use the with open() pattern",
+        tags: ["core"],
+        instruction: "Task A: Write the list below to a file called \"tools.txt\"\n        Each tool on its own line. Use with open().\n\nTask B: Read \"tools.txt\" back and print each line with its line number.\n\ntools = [\"Python\", \"Pandas\", \"SQL\", \"AWS\", \"Spark\"]",
+        expected: "1: Python\n2: Pandas\n3: SQL\n4: AWS\n5: Spark",
+        hint: "Write: with open(\"tools.txt\", \"w\") as f: f.write(tool + \"\\n\")\nRead:  with open(\"tools.txt\", \"r\") as f: for i, line in enumerate(f, 1):"
+      },
+      {
+        title: "Read a CSV manually (no pandas) — parse rows into a list of dicts",
+        meta: "Split on comma, strip whitespace",
+        tags: [],
+        instruction: "Parse the CSV string below manually — no pandas allowed.\nProduce a list of dictionaries, one per row.\nPrint each dictionary.\n\ncsv_data = \"\"\"ticker, price, volume\nAAPL, 412.0, 15000\nMSFT, 310.2, 22000\nTSLA, 180.5, 30000\"\"\"",
+        expected: "{'ticker': 'AAPL', 'price': '412.0', 'volume': '15000'}\n{'ticker': 'MSFT', 'price': '310.2', 'volume': '22000'}\n{'ticker': 'TSLA', 'price': '180.5', 'volume': '30000'}",
+        hint: "lines = csv_data.strip().split(\"\\n\")\nheaders = [h.strip() for h in lines[0].split(\",\")]\nfor line in lines[1:]: dict(zip(headers, [v.strip() for v in line.split(\",\")]))"
+      },
+      {
+        title: "try / except / finally — handle FileNotFoundError and ValueError",
+        meta: "Test by pointing to a file that does not exist",
+        tags: ["core"],
+        instruction: "Task A: Try to open a file called \"missing.txt\" that does not exist.\n        Catch FileNotFoundError and print a friendly message.\n        Use finally to print \"Attempted file read.\" regardless.\n\nTask B: Try to convert \"not-a-number\" to an integer.\n        Catch ValueError and print a friendly message.",
+        expected: "File not found: missing.txt\nAttempted file read.\nCannot convert 'not-a-number' to an integer.",
+        hint: "try:\n    open(\"missing.txt\")\nexcept FileNotFoundError:\n    print(\"File not found: missing.txt\")\nfinally:\n    print(\"Attempted file read.\")"
+      },
+      {
+        title: "Demonstrate why with open() is better than manual open/close",
+        meta: "Show both approaches side by side",
+        tags: ["stretch"],
+        instruction: "Write \"Hello from Aris\" to a file called \"demo.txt\" using BOTH methods:\n\nMethod A: manual open() and close()\nMethod B: with open() context manager\n\nThen explain in a comment WHY with open() is safer.\nThink about: what happens if an error occurs between open() and close()?",
+        expected: "# Method A — manual\nf = open(\"demo.txt\", \"w\")\nf.write(\"Hello from Aris\")\nf.close()  # If an error occurs above, this never runs!\n\n# Method B — with open()\nwith open(\"demo.txt\", \"w\") as f:\n    f.write(\"Hello from Aris\")\n# File is closed automatically, even if an error occurs",
+        hint: "with open() uses a context manager — it guarantees\nthe file is closed even if an exception is raised inside the block."
+      }
+    ]
+  },
+  {
+    num: "06", title: "OOP basics", file: "06_oop.py",
+    exercises: [
+      {
+        title: "Define a class with __init__, instance attributes, and a method",
+        meta: "e.g. Stock(ticker, price) with a describe() method",
+        tags: ["core"],
+        instruction: "Create a class called Stock with:\n  - __init__ that takes ticker (str) and price (float)\n  - An instance method called describe() that prints a summary\n\nTest with:\n  s = Stock(\"AAPL\", 412.0)\n  s.describe()",
+        expected: "Stock: AAPL | Price: $412.00",
+        hint: "def __init__(self, ticker, price):\n    self.ticker = ticker\n    self.price = price\n\ndef describe(self):\n    print(f\"Stock: {self.ticker} | Price: ${self.price:.2f}\")"
+      },
+      {
+        title: "Add __str__ and __repr__ to your class",
+        meta: "Show the difference between them in output",
+        tags: [],
+        instruction: "Add __str__ and __repr__ methods to your Stock class.\n\n__str__  → the human-readable version (used by print())\n__repr__ → the developer version (used in the console/debugger)\n\nTest with:\n  s = Stock(\"AAPL\", 412.0)\n  print(s)        → uses __str__\n  print(repr(s))  → uses __repr__",
+        expected: "AAPL — $412.00\nStock(ticker='AAPL', price=412.0)",
+        hint: "def __str__(self):\n    return f\"{self.ticker} — ${self.price:.2f}\"\n\ndef __repr__(self):\n    return f\"Stock(ticker='{self.ticker}', price={self.price})\""
+      },
+      {
+        title: "Inheritance — create a subclass that adds a new method",
+        meta: "e.g. ETF(Stock) with a holdings list",
+        tags: ["core"],
+        instruction: "Create a subclass called ETF that inherits from Stock and adds:\n  - A holdings attribute (a list of ticker strings)\n  - A list_holdings() method that prints each holding\n\nTest with:\n  e = ETF(\"SPY\", 524.0, [\"AAPL\", \"MSFT\", \"AMZN\", \"NVDA\"])\n  e.describe()\n  e.list_holdings()",
+        expected: "Stock: SPY | Price: $524.00\nSPY holds:\n  - AAPL\n  - MSFT\n  - AMZN\n  - NVDA",
+        hint: "class ETF(Stock):\n    def __init__(self, ticker, price, holdings):\n        super().__init__(ticker, price)\n        self.holdings = holdings"
+      },
+      {
+        title: "Add a class method and a static method to your class",
+        meta: "Factory pattern + a utility function",
+        tags: ["stretch"],
+        instruction: "Add two methods to your Stock class:\n\nTask A: CLASS METHOD from_string(cls, data_string)\n  - Takes a string like \"AAPL:412.0\"\n  - Parses it and returns a new Stock instance\n\nTask B: STATIC METHOD is_valid_ticker(ticker)\n  - Returns True if ticker is 1-5 uppercase letters\n  - Returns False otherwise\n\nTest:\n  s = Stock.from_string(\"MSFT:310.2\")\n  print(s)\n  print(Stock.is_valid_ticker(\"AAPL\"))\n  print(Stock.is_valid_ticker(\"aapl\"))\n  print(Stock.is_valid_ticker(\"TOOLONG\"))",
+        expected: "MSFT — $310.20\nTrue\nFalse\nFalse",
+        hint: "@classmethod\ndef from_string(cls, data_string):\n    ticker, price = data_string.split(\":\")\n    return cls(ticker, float(price))\n\n@staticmethod\ndef is_valid_ticker(ticker):\n    return ticker.isupper() and 1 <= len(ticker) <= 5"
+      },
+      {
+        title: "Build a mini Portfolio tracker — add(), remove(), total_value()",
+        meta: "The centrepiece of your first GitHub commit",
+        tags: ["github"],
+        instruction: "Build a Portfolio class that uses your Stock class.\nIt must have:\n  - __init__ → empty portfolio (dict of ticker → Stock)\n  - add(stock) → adds a Stock\n  - remove(ticker) → removes by ticker string\n  - total_value() → sum of all stock prices\n  - summary() → prints a formatted table\n\nTest sequence:\n  p = Portfolio()\n  p.add(Stock(\"AAPL\", 412.0))\n  p.add(Stock(\"MSFT\", 310.2))\n  p.add(Stock(\"TSLA\", 180.5))\n  p.remove(\"TSLA\")\n  p.summary()",
+        expected: "Added AAPL to portfolio.\nAdded MSFT to portfolio.\nAdded TSLA to portfolio.\nRemoved TSLA from portfolio.\n--- Portfolio Summary ---\nAAPL    $412.00\nMSFT    $310.20\nTotal value: $722.20",
+        hint: "self.holdings = {}\nadd: self.holdings[stock.ticker] = stock\nremove: del self.holdings[ticker]\ntotal_value: sum(s.price for s in self.holdings.values())"
+      }
+    ]
+  }
+];
+
+const tagMap = {
+  core: '<span class="tag tag-core">core</span>',
+  stretch: '<span class="tag tag-stretch">stretch</span>',
+  github: '<span class="tag tag-github">github</span>'
+};
+
+const state = {};
+let totalExercises = 0;
+
+function buildModules() {
+  const container = document.getElementById('modules');
+  data.forEach((mod, mi) => {
+    totalExercises += mod.exercises.length;
+    const el = document.createElement('div');
+    el.className = 'module' + (mi === 0 ? ' open' : '');
+    el.id = `mod-${mi}`;
+
+    const exercisesHTML = mod.exercises.map((ex, ei) => {
+      const tagsHTML = (ex.tags || []).map(t => tagMap[t]).join('');
+      return `
+        <div class="exercise" id="ex-${mi}-${ei}">
+          <div class="exercise-header" onclick="toggleExercise(${mi},${ei})">
+            <div class="checkbox" onclick="markDone(event,${mi},${ei})"><span class="checkmark">✓</span></div>
+            <div class="exercise-summary">
+              <div class="exercise-title">${ex.title}</div>
+              ${ex.meta ? `<div class="exercise-meta">// ${ex.meta}</div>` : ''}
+              ${tagsHTML ? `<div class="tags">${tagsHTML}<span class="tag tag-hint">hint inside</span></div>` : `<div class="tags"><span class="tag tag-hint">hint inside</span></div>`}
+            </div>
+            <span class="expand-icon">▶</span>
+          </div>
+          <div class="exercise-body">
+            <div class="section-label">Task</div>
+            <div class="instruction">${ex.instruction}</div>
+            <div class="section-label">Expected output</div>
+            <pre>${ex.expected}</pre>
+            <div class="section-label">Hint</div>
+            <div class="hint-box">${ex.hint}</div>
+            <button class="done-btn" onclick="markDone(event,${mi},${ei})">Mark as done</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    el.innerHTML = `
+      <div class="module-header" onclick="toggleModule(${mi})">
+        <span class="module-num">${mod.num}</span>
+        <span class="module-title">${mod.title}</span>
+        <span class="module-file">${mod.file}</span>
+        <span class="module-count" id="mc-${mi}">0 / ${mod.exercises.length}</span>
+        <span class="chevron">▶</span>
+      </div>
+      <div class="module-body">${exercisesHTML}</div>
+    `;
+    container.appendChild(el);
+  });
+}
+
+function toggleModule(mi) {
+  document.getElementById(`mod-${mi}`).classList.toggle('open');
+}
+
+function toggleExercise(mi, ei) {
+  document.getElementById(`ex-${mi}-${ei}`).classList.toggle('open');
+}
+
+function markDone(event, mi, ei) {
+  event.stopPropagation();
+  const key = `${mi}-${ei}`;
+  state[key] = !state[key];
+  const el = document.getElementById(`ex-${mi}-${ei}`);
+  el.classList.toggle('done', state[key]);
+  updateProgress(mi);
+}
+
+function updateProgress(mi) {
+  const modDone = data[mi].exercises.filter((_, ei) => state[`${mi}-${ei}`]).length;
+  const total = data[mi].exercises.length;
+  const mc = document.getElementById(`mc-${mi}`);
+  mc.textContent = `${modDone} / ${total}`;
+  mc.className = 'module-count' + (modDone === total ? ' done' : '');
+  document.getElementById(`mod-${mi}`).classList.toggle('all-done', modDone === total);
+
+  const totalDone = Object.values(state).filter(Boolean).length;
+  document.getElementById('pbar').style.width = (totalDone / totalExercises * 100) + '%';
+  document.getElementById('done-count').textContent = totalDone;
+  document.getElementById('banner').classList.toggle('visible', totalDone === totalExercises);
+}
+
+buildModules();
+</script>
+</body>
+</html>
